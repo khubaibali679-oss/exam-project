@@ -1,0 +1,7 @@
+venv/
+.venv/
+demo-app/venv/
+ai-service/venv/
+__pycache__/
+*.pyc
+.env
