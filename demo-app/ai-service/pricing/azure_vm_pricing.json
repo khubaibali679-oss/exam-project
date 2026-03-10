@@ -1,0 +1,17 @@
+{
+  "B2s": {
+    "hourly": 0.0464,
+    "vcpu": 2,
+    "memory_gb": 4
+  },
+  "B4ms": {
+    "hourly": 0.166,
+    "vcpu": 4,
+    "memory_gb": 16
+  },
+  "D2s_v3": {
+    "hourly": 0.096,
+    "vcpu": 2,
+    "memory_gb": 8
+  }
+}

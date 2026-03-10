@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: random-stress
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: random-stress
+  template:
+    metadata:
+      labels:
+        app: random-stress
+    spec:
+      containers:
+        - name: random-stress
+          image: alpine:3.19
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache stress-ng bash coreutils
+              echo "random-stress container started"
+              while true; do
+                CPU_WORKERS=$(( (RANDOM % 2) + 1 ))
+                MEM_MB=$(( (RANDOM % 80) + 40 ))
+                DURATION=$(( (RANDOM % 20) + 15 ))
+                SLEEP_GAP=$(( (RANDOM % 15) + 10 ))
+
+                echo "Running stress-ng: cpu=${CPU_WORKERS}, mem=${MEM_MB}MB, duration=${DURATION}s"
+                stress-ng \
+                  --cpu ${CPU_WORKERS} \
+                  --vm 1 \
+                  --vm-bytes ${MEM_MB}M \
+                  --timeout ${DURATION}s \
+                  --metrics-brief || true
+
+                echo "Sleeping ${SLEEP_GAP}s"
+                sleep ${SLEEP_GAP}
+              done
+          resources:
+            requests:
+              cpu: "150m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
