@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-burst
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-burst
+  template:
+    metadata:
+      labels:
+        app: demo-burst
+    spec:
+      containers:
+        - name: demo-burst
+          image: alpine:3.19
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache stress-ng bash coreutils
+              echo "demo-burst started"
+
+              while true; do
+                CPU_WORKERS=$(( (RANDOM % 1) + 1 ))
+                MEM_MB=$(( (RANDOM % 30) + 20 ))
+                DURATION=$(( (RANDOM % 15) + 8 ))
+                SLEEP_GAP=$(( (RANDOM % 20) + 10 ))
+
+                echo "Burst: cpu=${CPU_WORKERS}, mem=${MEM_MB}MB, duration=${DURATION}s, sleep=${SLEEP_GAP}s"
+
+                stress-ng \
+                  --cpu ${CPU_WORKERS} \
+                  --vm 1 \
+                  --vm-bytes ${MEM_MB}M \
+                  --timeout ${DURATION}s \
+                  --metrics-brief || true
+
+                sleep ${SLEEP_GAP}
+              done
+          resources:
+            requests:
+              cpu: "80m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: demo-burst-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: demo-burst
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

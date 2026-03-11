@@ -2,13 +2,4 @@ Forwarding from 0.0.0.0:3000 -> 3000
 Handling connection for 3000
 Handling connection for 3000
 Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
-Handling connection for 3000
+E0311 19:30:10.317647   48178 portforward.go:404] "Unhandled Error" err="error copying from local connection to remote stream: writeto tcp4 10.0.0.4:3000->91.224.92.177:53046: read tcp4 10.0.0.4:3000->91.224.92.177:53046: read: connection reset by peer"
